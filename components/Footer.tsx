@@ -8,7 +8,7 @@ const Footer: React.FC<FooterProps> = () => {
   return (
     <footer className="bg-black text-gray-300 mt-auto">
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center md:text-left">
           <div className="flex flex-col items-center md:items-start">
             <div className="mb-2">
               <Logo className="h-12 w-auto text-white" />
@@ -20,6 +20,10 @@ const Footer: React.FC<FooterProps> = () => {
             <p>Treichville, Abidjan, Côte d'Ivoire</p>
             <p>+225 0787324514</p>
             <p>Toujours ouvert</p>
+          </div>
+          <div>
+            <h3 className="font-semibold text-white mb-4">Revendeur Agrée</h3>
+            <p>+225 0787324514</p>
           </div>
           <div>
             <h3 className="font-semibold text-white mb-4">Liens Rapides</h3>
