@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Bannière Rapide</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-btn { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 10px 5px; }
+        .test-btn:hover { background: #0056b3; }
+        .result { margin: 20px 0; padding: 15px; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+    </style>
+</head>
+<body>
+    <h1>Test Bannière Rapide</h1>
+    <p>Créer une bannière de test pour vérifier le slider</p>
+    
+    <button class="test-btn" onclick="creerBanniereTest()">Créer Bannière Test</button>
+    <button class="test-btn" onclick="verifierBannieres()">Vérifier Bannières Actives</button>
+    <button class="test-btn" onclick="activerBannieres()">Activer Toutes les Bannières</button>
+    
+    <div id="resultat"></div>
+
+    <script>
+        // Configuration Firebase (à adapter avec vos propres clés)
+        const firebaseConfig = {
+            apiKey: "AIzaSyC9KSGX0I0u6KqihJ7QP9fEET5xtdc_0sg",
+            authDomain: "inzastore-iphone-shop.firebaseapp.com",
+            projectId: "inzastore-iphone-shop",
+            storageBucket: "inzastore-iphone-shop.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abcdef123456789"
+        };
+
+        // Initialiser Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        function afficherResultat(message, type = 'info') {
+            const resultDiv = document.getElementById('resultat');
+            resultDiv.innerHTML = `<div class="result ${type}">${message}</div>`;
+        }
+
+        async function creerBanniereTest() {
+            try {
+                afficherResultat('Création de la bannière de test...', 'info');
+
+                // Créer une bannière de test avec une image Unsplash
+                const banniereTest = {
+                    name: 'Promotion Spéciale',
+                    description: 'Découvrez nos offres exceptionnelles sur tous les produits Apple',
+                    buttonText: 'Voir les Offres',
+                    buttonLink: '/products',
+                    imageUrl: 'https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?q=80&w=1200&h=800&auto=format&fit=crop',
+                    position: 1,
+                    isActive: true,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                const docRef = await db.collection('banners').add(banniereTest);
+                afficherResultat(`✅ Bannière de test créée avec succès! ID: ${docRef.id}`, 'success');
+                
+                // Créer une deuxième bannière
+                const banniereTest2 = {
+                    name: 'Nouveautés AirPods',
+                    description: 'Les derniers AirPods avec réduction de bruit active',
+                    buttonText: 'Découvrir',
+                    buttonLink: '/products?category=AirPods',
+                    imageUrl: 'https://images.unsplash.com/photo-1606841701189-8d5b2ba4430e?q=80&w=1200&h=800&auto=format&fit=crop',
+                    position: 2,
+                    isActive: true,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                const docRef2 = await db.collection('banners').add(banniereTest2);
+                afficherResultat(`✅ Deuxième bannière créée! ID: ${docRef2.id}`, 'success');
+
+            } catch (error) {
+                console.error('Erreur:', error);
+                afficherResultat(`❌ Erreur lors de la création: ${error.message}`, 'error');
+            }
+        }
+
+        async function verifierBannieres() {
+            try {
+                afficherResultat('Vérification des bannières actives...', 'info');
+                
+                const snapshot = await db.collection('banners')
+                    .where('isActive', '==', true)
+                    .orderBy('position')
+                    .get();
+
+                if (snapshot.empty) {
+                    afficherResultat('⚠️ Aucune bannière active trouvée!', 'error');
+                    return;
+                }
+
+                let message = `✅ ${snapshot.size} bannière(s) active(s) trouvée(s):<br>`;
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    message += `- ${data.name} (Position: ${data.position})<br>`;
+                });
+                
+                afficherResultat(message, 'success');
+
+            } catch (error) {
+                console.error('Erreur:', error);
+                afficherResultat(`❌ Erreur lors de la vérification: ${error.message}`, 'error');
+            }
+        }
+
+        async function activerBannieres() {
+            try {
+                afficherResultat('Activation de toutes les bannières...', 'info');
+                
+                const snapshot = await db.collection('banners').get();
+                
+                if (snapshot.empty) {
+                    afficherResultat('⚠️ Aucune bannière trouvée!', 'error');
+                    return;
+                }
+
+                const batch = db.batch();
+                snapshot.forEach(doc => {
+                    batch.update(doc.ref, { isActive: true });
+                });
+                
+                await batch.commit();
+                afficherResultat(`✅ ${snapshot.size} bannière(s) activée(s)!`, 'success');
+
+            } catch (error) {
+                console.error('Erreur:', error);
+                afficherResultat(`❌ Erreur lors de l'activation: ${error.message}`, 'error');
+            }
+        }
+
+        // Vérifier au chargement
+        window.onload = function() {
+            verifierBannieres();
+        };
+    </script>
+</body>
+</html>

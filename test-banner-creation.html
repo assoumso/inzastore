@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Création de Bannière</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        .info {
+            color: blue;
+        }
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .test-btn {
+            background-color: #007bff;
+            color: white;
+        }
+        .test-btn:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 3px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test du Système de Bannières</h1>
+    
+    <div class="test-section">
+        <h2>Test 1: Créer une bannière de test</h2>
+        <p>Crée une bannière de test dans Firebase</p>
+        <button class="test-btn" onclick="testCreateBanner()">Créer Bannière Test</button>
+        <div id="createResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 2: Récupérer toutes les bannières</h2>
+        <p>Récupère toutes les bannières depuis Firebase</p>
+        <button class="test-btn" onclick="testGetAllBanners()">Récupérer Bannières</button>
+        <div id="getAllResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3: Récupérer les bannières actives</h2>
+        <p>Récupère uniquement les bannières actives</p>
+        <button class="test-btn" onclick="testGetActiveBanners()">Récupérer Bannières Actives</button>
+        <div id="getActiveResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 4: Tester le Hero Component</h2>
+        <p>Ouvre le composant Hero pour voir les bannières</p>
+        <button class="test-btn" onclick="testHeroComponent()">Tester Hero</button>
+        <div id="heroResult" class="result"></div>
+    </div>
+
+    <script type="module">
+        // Importer Firebase (version modulaire)
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
+        import { getFirestore, collection, addDoc, getDocs, query, where, orderBy } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
+
+        // Configuration Firebase (utiliser les mêmes valeurs que votre projet)
+        const firebaseConfig = {
+            apiKey: "AIzaSyA0tF8VE-3a0I2w7X5T5T5T5T5T5T5T5T5",
+            authDomain: "inzastore.firebaseapp.com",
+            projectId: "inzastore",
+            storageBucket: "inzastore.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:abcdef1234567890abcdef"
+        };
+
+        // Initialiser Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Fonctions de test
+        window.testCreateBanner = async function() {
+            const resultDiv = document.getElementById('createResult');
+            try {
+                resultDiv.textContent = 'Création en cours...';
+                
+                const bannerData = {
+                    name: 'Bannière Test ' + new Date().toLocaleTimeString(),
+                    description: 'Ceci est une bannière de test créée automatiquement',
+                    buttonText: 'Cliquez ici',
+                    buttonLink: '#test',
+                    imageUrl: 'https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+                    position: 1,
+                    isActive: true,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                };
+
+                const docRef = await addDoc(collection(db, 'banners'), bannerData);
+                resultDiv.innerHTML = `<span class="success">✓ Bannière créée avec succès!</span>\nID: ${docRef.id}\nDonnées: ${JSON.stringify(bannerData, null, 2)}`;
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">✗ Erreur: ${error.message}</span>`;
+            }
+        };
+
+        window.testGetAllBanners = async function() {
+            const resultDiv = document.getElementById('getAllResult');
+            try {
+                resultDiv.textContent = 'Récupération en cours...';
+                
+                const querySnapshot = await getDocs(collection(db, 'banners'));
+                const banners = [];
+                querySnapshot.forEach((doc) => {
+                    banners.push({ id: doc.id, ...doc.data() });
+                });
+
+                resultDiv.innerHTML = `<span class="success">✓ ${banners.length} bannières trouvées</span>\n${JSON.stringify(banners, null, 2)}`;
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">✗ Erreur: ${error.message}</span>`;
+            }
+        };
+
+        window.testGetActiveBanners = async function() {
+            const resultDiv = document.getElementById('getActiveResult');
+            try {
+                resultDiv.textContent = 'Récupération en cours...';
+                
+                const q = query(collection(db, 'banners'), where('isActive', '==', true), orderBy('position'));
+                const querySnapshot = await getDocs(q);
+                const banners = [];
+                querySnapshot.forEach((doc) => {
+                    banners.push({ id: doc.id, ...doc.data() });
+                });
+
+                resultDiv.innerHTML = `<span class="success">✓ ${banners.length} bannières actives trouvées</span>\n${JSON.stringify(banners, null, 2)}`;
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">✗ Erreur: ${error.message}</span>`;
+            }
+        };
+
+        window.testHeroComponent = function() {
+            const resultDiv = document.getElementById('heroResult');
+            resultDiv.innerHTML = `<span class="info">ℹ️ Pour tester le composant Hero, ouvrez votre application principale et vérifiez que les bannières s\'affichent correctement.</span>\n\nVérifiez que:\n1. Les bannières actives s\'affichent\n2. Le carrousel fonctionne\n3. Les boutons de navigation fonctionnent\n4. Le changement automatique toutes les 5 secondes fonctionne`;
+        };
+    </script>
+</body>
+</html>

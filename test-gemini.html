@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Gemini AI</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        .result { margin: 10px 0; padding: 10px; background: #f5f5f5; border-radius: 3px; }
+        .error { color: red; }
+        .success { color: green; }
+        .loading { color: orange; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Test des fonctionnalités Gemini AI</h1>
+        
+        <div class="test-section">
+            <h2>Configuration</h2>
+            <div id="config-status">Vérification de la configuration...</div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Test de génération de description</h2>
+            <input type="text" id="product-name" placeholder="Nom du produit" value="Smartphone Samsung Galaxy S24">
+            <input type="text" id="category" placeholder="Catégorie" value="Électronique">
+            <button onclick="testDescriptionGeneration()">Générer description</button>
+            <div id="description-result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Test de génération d'image</h2>
+            <input type="text" id="image-prompt" placeholder="Description de l'image" value="Smartphone moderne avec écran brillant">
+            <button onclick="testImageGeneration()">Générer image</button>
+            <div id="image-result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Test complet produit</h2>
+            <input type="text" id="full-product" placeholder="Nom complet du produit" value="Ordinateur portable gaming MSI">
+            <button onclick="testFullProductGeneration()">Génération complète</button>
+            <div id="full-result"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { GeminiProductGenerationService } from './services/geminiGeneration.js';
+        import { ConfigService } from './services/config.js';
+        
+        // Vérifier la configuration
+        function checkConfig() {
+            const configService = ConfigService.getInstance();
+            const hasApiKey = configService.hasGeminiApiKey();
+            const apiKey = configService.getGeminiApiKey();
+            
+            const configDiv = document.getElementById('config-status');
+            if (hasApiKey) {
+                configDiv.innerHTML = `<span class="success">✓ Configuration OK</span><br>Clé API: ${apiKey.substring(0, 10)}...`;
+                return true;
+            } else {
+                configDiv.innerHTML = `<span class="error">✗ Clé API Gemini non configurée</span><br>Veuillez définir VITE_GEMINI_API_KEY dans .env.local`;
+                return false;
+            }
+        }
+        
+        // Test génération description
+        window.testDescriptionGeneration = async function() {
+            const resultDiv = document.getElementById('description-result');
+            resultDiv.innerHTML = '<span class="loading">Génération en cours...</span>';
+            
+            try {
+                const configService = ConfigService.getInstance();
+                const apiKey = configService.getGeminiApiKey();
+                
+                if (!apiKey) {
+                    throw new Error('Clé API non configurée');
+                }
+                
+                const service = new GeminiProductGenerationService(apiKey);
+                const productName = document.getElementById('product-name').value;
+                const category = document.getElementById('category').value;
+                
+                const content = await service.generateDescription({
+                    productName,
+                    category,
+                    language: 'fr'
+                });
+                
+                resultDiv.innerHTML = `
+                    <div class="result">
+                        <h3>Description générée:</h3>
+                        <p><strong>Titre:</strong> ${content.title}</p>
+                        <p><strong>Description:</strong> ${content.description}</p>
+                        <p><strong>Prix suggéré:</strong> ${content.suggestedPrice}€</p>
+                        <p><strong>Mots-clés:</strong> ${content.keywords.join(', ')}</p>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">Erreur: ${error.message}</div>`;
+            }
+        };
+        
+        // Test génération image
+        window.testImageGeneration = async function() {
+            const resultDiv = document.getElementById('image-result');
+            resultDiv.innerHTML = '<span class="loading">Génération en cours...</span>';
+            
+            try {
+                const configService = ConfigService.getInstance();
+                const apiKey = configService.getGeminiApiKey();
+                
+                if (!apiKey) {
+                    throw new Error('Clé API non configurée');
+                }
+                
+                const service = new GeminiProductGenerationService(apiKey);
+                const prompt = document.getElementById('image-prompt').value;
+                
+                const image = await service.generateImage(prompt);
+                
+                resultDiv.innerHTML = `
+                    <div class="result">
+                        <h3>Image générée:</h3>
+                        <p><strong>URL:</strong> ${image.url}</p>
+                        <p><strong>Alt text:</strong> ${image.altText}</p>
+                        ${image.url ? `<img src="${image.url}" alt="${image.altText}" style="max-width: 300px;">` : ''}
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">Erreur: ${error.message}</div>`;
+            }
+        };
+        
+        // Test génération complète
+        window.testFullProductGeneration = async function() {
+            const resultDiv = document.getElementById('full-result');
+            resultDiv.innerHTML = '<span class="loading">Génération complète en cours...</span>';
+            
+            try {
+                const configService = ConfigService.getInstance();
+                const apiKey = configService.getGeminiApiKey();
+                
+                if (!apiKey) {
+                    throw new Error('Clé API non configurée');
+                }
+                
+                const service = new GeminiProductGenerationService(apiKey);
+                const productName = document.getElementById('full-product').value;
+                
+                const result = await service.generateCompleteProduct({
+                    productName,
+                    category: 'Informatique',
+                    includeImage: true,
+                    language: 'fr'
+                });
+                
+                resultDiv.innerHTML = `
+                    <div class="result">
+                        <h3>Produit généré complètement:</h3>
+                        <p><strong>Titre:</strong> ${result.content.title}</p>
+                        <p><strong>Description:</strong> ${result.content.description}</p>
+                        <p><strong>Prix:</strong> ${result.content.suggestedPrice}€</p>
+                        <p><strong>Mots-clés:</strong> ${result.content.keywords.join(', ')}</p>
+                        ${result.image ? `<p><strong>Image:</strong> ${result.image.url}</p>` : '<p><em>Pas d\'image générée</em></p>'}
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">Erreur: ${error.message}</div>`;
+            }
+        };
+        
+        // Initialisation
+        checkConfig();
+    </script>
+</body>
+</html>

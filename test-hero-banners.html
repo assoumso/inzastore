@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Hero avec Bannières</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        }
+        .hero-container {
+            position: relative;
+            height: 70vh;
+            min-height: 500px;
+            overflow: hidden;
+        }
+        .hero-slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+        .hero-slide.active {
+            opacity: 1;
+        }
+        .hero-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to right, rgba(0,0,0,0.4), rgba(0,0,0,0.6));
+        }
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            padding: 0 1rem;
+        }
+        .hero-title {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        .hero-description {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        .hero-button {
+            display: inline-block;
+            background: white;
+            color: #1a1a1a;
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        .hero-button:hover {
+            background-color: #f3f4f6;
+        }
+        .hero-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 20;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease;
+        }
+        .hero-nav:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        .hero-nav.prev {
+            left: 1rem;
+        }
+        .hero-nav.next {
+            right: 1rem;
+        }
+        .hero-indicators {
+            position: absolute;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            display: flex;
+            gap: 0.5rem;
+        }
+        .hero-indicator {
+            width: 0.75rem;
+            height: 0.75rem;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255,255,255,0.5);
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .hero-indicator.active {
+            background: white;
+        }
+        .hero-indicator:hover {
+            background: rgba(255,255,255,0.75);
+        }
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+            .hero-description {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero-container" id="heroContainer">
+        <!-- Les slides seront générés dynamiquement -->
+    </div>
+
+    <script>
+        // Données de test pour les bannières
+        const testBanners = [
+            {
+                id: '1',
+                name: 'Soldes d\'Été 2024',
+                description: 'Jusqu\'à 50% de réduction sur une sélection d\'articles',
+                buttonText: 'Voir les soldes',
+                buttonLink: '#soldes',
+                imageUrl: 'https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80'
+            },
+            {
+                id: '2',
+                name: 'Nouvelle Collection',
+                description: 'Découvrez nos derniers arrivages',
+                buttonText: 'Découvrir',
+                buttonLink: '#nouveautes',
+                imageUrl: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80'
+            },
+            {
+                id: '3',
+                name: 'Livraison Gratuite',
+                description: 'Sur toutes les commandes de plus de 50€',
+                buttonText: 'En profiter',
+                buttonLink: '#livraison',
+                imageUrl: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80'
+            }
+        ];
+
+        let currentBannerIndex = 0;
+        let autoSlideInterval;
+
+        function createHeroSlides() {
+            const container = document.getElementById('heroContainer');
+            
+            testBanners.forEach((banner, index) => {
+                const slide = document.createElement('div');
+                slide.className = `hero-slide ${index === 0 ? 'active' : ''}`;
+                slide.innerHTML = `
+                    <img src="${banner.imageUrl}" alt="${banner.name}" class="hero-image">
+                    <div class="hero-overlay"></div>
+                    <div class="hero-content">
+                        <div>
+                            <h1 class="hero-title">${banner.name}</h1>
+                            <p class="hero-description">${banner.description}</p>
+                            <a href="${banner.buttonLink}" class="hero-button">${banner.buttonText}</a>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(slide);
+            });
+
+            // Ajouter les boutons de navigation
+            const prevButton = document.createElement('button');
+            prevButton.className = 'hero-nav prev';
+            prevButton.innerHTML = '‹';
+            prevButton.onclick = goToPrevBanner;
+            container.appendChild(prevButton);
+
+            const nextButton = document.createElement('button');
+            nextButton.className = 'hero-nav next';
+            nextButton.innerHTML = '›';
+            nextButton.onclick = goToNextBanner;
+            container.appendChild(nextButton);
+
+            // Ajouter les indicateurs
+            const indicatorsContainer = document.createElement('div');
+            indicatorsContainer.className = 'hero-indicators';
+            
+            testBanners.forEach((_, index) => {
+                const indicator = document.createElement('button');
+                indicator.className = `hero-indicator ${index === 0 ? 'active' : ''}`;
+                indicator.onclick = () => goToBanner(index);
+                indicatorsContainer.appendChild(indicator);
+            });
+            
+            container.appendChild(indicatorsContainer);
+        }
+
+        function updateSlide(index) {
+            const slides = document.querySelectorAll('.hero-slide');
+            const indicators = document.querySelectorAll('.hero-indicator');
+            
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === index);
+            });
+            
+            indicators.forEach((indicator, i) => {
+                indicator.classList.toggle('active', i === index);
+            });
+        }
+
+        function goToBanner(index) {
+            currentBannerIndex = index;
+            updateSlide(currentBannerIndex);
+            resetAutoSlide();
+        }
+
+        function goToNextBanner() {
+            currentBannerIndex = (currentBannerIndex + 1) % testBanners.length;
+            updateSlide(currentBannerIndex);
+            resetAutoSlide();
+        }
+
+        function goToPrevBanner() {
+            currentBannerIndex = currentBannerIndex === 0 ? testBanners.length - 1 : currentBannerIndex - 1;
+            updateSlide(currentBannerIndex);
+            resetAutoSlide();
+        }
+
+        function resetAutoSlide() {
+            clearInterval(autoSlideInterval);
+            startAutoSlide();
+        }
+
+        function startAutoSlide() {
+            autoSlideInterval = setInterval(goToNextBanner, 5000);
+        }
+
+        // Initialisation
+        createHeroSlides();
+        startAutoSlide();
+
+        // Pause sur survol
+        const heroContainer = document.getElementById('heroContainer');
+        heroContainer.addEventListener('mouseenter', () => clearInterval(autoSlideInterval));
+        heroContainer.addEventListener('mouseleave', startAutoSlide);
+    </script>
+</body>
+</html>

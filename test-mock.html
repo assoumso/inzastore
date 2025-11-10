@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Mock Gemini</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .log { background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .error { background: #ffe0e0; color: #d00; }
+        .success { background: #e0ffe0; color: #060; }
+        button { padding: 10px 20px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>Test Service Mock Gemini</h1>
+    <button onclick="testMockService()">Tester le Service Mock</button>
+    <div id="logs"></div>
+
+    <script type="module">
+        import { createGeminiService } from './services/geminiMockService.js';
+        
+        window.testMockService = async function() {
+            const logs = document.getElementById('logs');
+            logs.innerHTML = '';
+            
+            function addLog(message, type = 'info') {
+                const div = document.createElement('div');
+                div.className = `log ${type}`;
+                div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+                logs.appendChild(div);
+            }
+            
+            try {
+                addLog('Création du service mock...');
+                const service = createGeminiService('mock-key');
+                
+                addLog('Test de génération de description...');
+                const result = await service.generateCompleteProduct({
+                    productName: 'iPhone 15 Pro',
+                    category: 'Smartphones',
+                    brand: 'Apple',
+                    language: 'français',
+                    descriptionLength: 'medium',
+                    tone: 'professional'
+                });
+                
+                addLog('✅ Génération réussie!', 'success');
+                addLog(`Description: ${result.content.description.substring(0, 100)}...`, 'success');
+                addLog(`Caractéristiques: ${result.content.features.join(', ')}`, 'success');
+                if (result.image) {
+                    addLog(`Image: ${result.image.url}`, 'success');
+                }
+                
+            } catch (error) {
+                addLog(`❌ Erreur: ${error.message}`, 'error');
+                console.error('Erreur complète:', error);
+            }
+        };
+    </script>
+</body>
+</html>

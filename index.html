@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>INZASTORE</title>
+    <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAMAAACahl6sAAAAFVBMVEX///8AAADf39/ExMS3t7fNzc3q6upDxyiYAAACl0lEQVR4nO3c63KrMBAFYBIFwdz/fRdd3dFqKQSJdZvrnrP3uUfTDZAgAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgH/L7Xbz+bz5P/k0nufz+ez5/T6/v9/f7/f9/f2+B/h9f39/v9/X+/v7fX9/f9+H/t4+A/P6AfN6b5+Beb02/qBP49b+oE/j1v6gT+PW/qBP49Z+w3N8h8fr/2wYkC98j+P1f4uAQIE+y+P1f0uAgEC+wOP1f0uAgEB+gX/pA4YCA/mBf+kDhoIB/cI/6QOGggL5hv/SBwwFA/kG/6QOGAoE5Av+kzhgIBCT/0mccBAISf+kzhgIBOT/0mcMBAKC/3mcMBAI+P+kzhgIxP/vA+Z5Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9Aed9-ed...AAAAAAAAAAAASUVORK5CYII=" />
+    <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/client": "https://aistudiocdn.com/react-dom@^19.2.0/client",
+    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^6.22.3",
+    "firebase/compat/app": "https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js",
+    "firebase/compat/firestore": "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js",
+    "firebase/compat/storage": "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "firebase/": "https://aistudiocdn.com/firebase@^12.5.0/"
+  }
+}
+</script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Lora:ital,wght@0,400..700;1,400..700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              serif: ['Lora', 'serif'],
+              orbitron: ['Orbitron', 'sans-serif'],
+            },
+            animation: {
+              'reveal-up': 'revealUp 0.8s cubic-bezier(0.25,0.46,0.45,0.94) forwards',
+              'fade-in': 'fadeIn 1s ease-out forwards',
+            },
+            keyframes: {
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      @keyframes revealUp {
+        from {
+          transform: translateY(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .text-stroke {
+        -webkit-text-stroke: 2px white;
+        -webkit-text-fill-color: transparent;
+      }
+    </style>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="bg-black text-gray-300">
+  <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>

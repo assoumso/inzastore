@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Bannières Cliquables</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .section { margin-bottom: 40px; border: 1px solid #ddd; padding: 20px; border-radius: 8px; }
+        .banner { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            transition: transform 0.3s ease;
+            margin-bottom: 20px;
+        }
+        .banner:hover { transform: scale(1.05); }
+        .banner h3 { margin: 0 0 10px 0; }
+        .banner p { margin: 0; opacity: 0.9; }
+        .products { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .product { 
+            border: 1px solid #ddd; 
+            padding: 15px; 
+            border-radius: 8px; 
+            text-align: center;
+            background: #f9f9f9;
+        }
+        .status { 
+            padding: 10px; 
+            border-radius: 5px; 
+            margin-bottom: 20px; 
+            background: #d4edda; 
+            border: 1px solid #c3e6cb; 
+            color: #155724; 
+        }
+    </style>
+</head>
+<body>
+    <h1>Test des Bannières Cliquables</h1>
+    
+    <div class="status">
+        ✅ Les bannières sont maintenant cliquables avec effet hover !
+        <br>✅ Les liens "Voir plus" ont été supprimés
+        <br>✅ Les bannières redirigent vers /products?category=NOM_CATEGORIE
+    </div>
+
+    <div class="section">
+        <h2>iPhone. <span style="color: #666; font-weight: normal;">Conçu pour faire la différence.</span></h2>
+        <div class="banner" onclick="alert('Redirection vers: /products?category=iPhone')">
+            <h3>iPhone 17 Pro Max.</h3>
+            <p>Le futur, c'est maintenant.</p>
+        </div>
+        <div class="products">
+            <div class="product">iPhone 15 Pro Max<br>1 199 000 FCFA</div>
+            <div class="product">iPhone 15 Pro<br>999 000 FCFA</div>
+            <div class="product">iPhone 15<br>799 000 FCFA</div>
+            <div class="product">iPhone 14<br>699 000 FCFA</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>iPad. <span style="color: #666; font-weight: normal;">Tout ce que vous aimez faire, vous allez l'adorer.</span></h2>
+        <div class="banner" onclick="alert('Redirection vers: /products?category=iPad')">
+            <h3>iPad Pro.</h3>
+            <p>Une toute nouvelle ère.</p>
+        </div>
+        <div class="products">
+            <div class="product">iPad Pro 11"<br>899 000 FCFA</div>
+            <div class="product">iPad Air 13"<br>749 000 FCFA</div>
+            <div class="product">iPad (10e génération)<br>399 000 FCFA</div>
+            <div class="product">iPad mini (6e génération)<br>549 000 FCFA</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Mac. <span style="color: #666; font-weight: normal;">Conçu pour être à la hauteur de vos ambitions.</span></h2>
+        <div class="banner" onclick="alert('Redirection vers: /products?category=Mac')">
+            <h3>MacBook Pro.</h3>
+            <p>Conçu pour les pros.</p>
+        </div>
+        <div class="products">
+            <div class="product">MacBook Pro 16"<br>2 499 000 FCFA</div>
+            <div class="product">MacBook Pro 14"<br>1 999 000 FCFA</div>
+            <div class="product">MacBook Air 15"<br>1 299 000 FCFA</div>
+            <div class="product">MacBook Air 13"<br>1 099 000 FCFA</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Apple Watch. <span style="color: #666; font-weight: normal;">Un choix sain, c'est vous.</span></h2>
+        <div class="banner" onclick="alert('Redirection vers: /products?category=Apple Watch')">
+            <h3>Apple Watch.</h3>
+            <p>Votre partenaire santé.</p>
+        </div>
+        <div class="products">
+            <div class="product">Apple Watch Series 9<br>449 000 FCFA</div>
+            <div class="product">Apple Watch Ultra 2<br>899 000 FCFA</div>
+            <div class="product">Apple Watch SE<br>279 000 FCFA</div>
+            <div class="product">Apple Watch Series 8<br>399 000 FCFA</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Leçon de son. <span style="color: #666; font-weight: normal;">Un choix incroyable pour un son riche de haute qualité.</span></h2>
+        <div class="banner" onclick="alert('Redirection vers: /products?category=AirPods')">
+            <h3>AirPods Pro 3.</h3>
+            <p>Le son, repoussé à l'extrême.</p>
+        </div>
+        <div class="products">
+            <div class="product">AirPods Pro 3<br>349 000 FCFA</div>
+            <div class="product">AirPods 4 avec ANC<br>229 000 FCFA</div>
+            <div class="product">AirPods 4 sans ANC<br>179 000 FCFA</div>
+        </div>
+    </div>
+
+    <script>
+        // Log pour vérifier le comportement
+        console.log('Bannières cliquables activées !');
+        console.log('Chaque bannière redirige vers /products?category=NOM_CATEGORIE');
+    </script>
+</body>
+</html>

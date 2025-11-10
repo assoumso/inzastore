@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API Gemini Direct</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        .result { margin: 10px 0; padding: 10px; background: #f5f5f5; border-radius: 3px; white-space: pre-wrap; }
+        .error { color: red; }
+        .success { color: green; }
+        .loading { color: orange; }
+        input, textarea { width: 100%; padding: 8px; margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Test Direct API Gemini</h1>
+        
+        <div class="test-section">
+            <h2>Configuration API</h2>
+            <label>Clé API Gemini:</label>
+            <input type="text" id="api-key" placeholder="Votre clé API Gemini" value="AIzaSyCPEup2x_tXIEaRWYGW1rSbAomJzSqjN6c">
+            
+            <label>Modèle:</label>
+            <select id="model">
+                <option value="gemini-1.5-flash">gemini-1.5-flash</option>
+                <option value="gemini-pro">gemini-pro</option>
+                <option value="gemini-pro-vision">gemini-pro-vision</option>
+            </select>
+        </div>
+        
+        <div class="test-section">
+            <h2>Test Simple</h2>
+            <label>Message:</label>
+            <textarea id="message" rows="3">Bonjour, comment vas-tu?</textarea>
+            <button onclick="testSimpleMessage()">Envoyer message simple</button>
+            <div id="simple-result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Test Génération Produit</h2>
+            <label>Nom du produit:</label>
+            <input type="text" id="product-name" value="Smartphone Samsung Galaxy S24">
+            <label>Catégorie:</label>
+            <input type="text" id="category" value="Électronique">
+            <button onclick="testProductGeneration()">Générer description produit</button>
+            <div id="product-result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Test avec Différents Headers</h2>
+            <button onclick="testWithHeaders()">Tester avec headers complets</button>
+            <div id="headers-result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Résultat Brut</h2>
+            <div id="raw-result" style="background: #000; color: #0f0; font-family: monospace; padding: 10px; max-height: 300px; overflow-y: auto;"></div>
+        </div>
+    </div>
+
+    <script>
+        function logRaw(message) {
+            const rawDiv = document.getElementById('raw-result');
+            rawDiv.textContent += new Date().toLocaleTimeString() + ' - ' + message + '\n';
+            rawDiv.scrollTop = rawDiv.scrollHeight;
+        }
+        
+        async function testSimpleMessage() {
+            const resultDiv = document.getElementById('simple-result');
+            const apiKey = document.getElementById('api-key').value;
+            const model = document.getElementById('model').value;
+            const message = document.getElementById('message').value;
+            
+            resultDiv.innerHTML = '<span class="loading">Test en cours...</span>';
+            logRaw('Début test simple');
+            
+            try {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+                logRaw(`URL: ${url}`);
+                
+                const requestBody = {
+                    contents: [{
+                        parts: [{
+                            text: message
+                        }]
+                    }]
+                };
+                
+                logRaw(`Corps de la requête: ${JSON.stringify(requestBody, null, 2)}`);
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+                
+                logRaw(`Status: ${response.status} ${response.statusText}`);
+                logRaw(`Headers: ${JSON.stringify(Object.fromEntries(response.headers))}`);
+                
+                const responseText = await response.text();
+                logRaw(`Réponse brute: ${responseText}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${responseText}`);
+                }
+                
+                const data = JSON.parse(responseText);
+                const result = data.candidates[0].content.parts[0].text;
+                
+                resultDiv.innerHTML = `
+                    <div class="result success">
+                        <strong>Succès!</strong><br>
+                        ${result}
+                    </div>
+                `;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">Erreur: ${error.message}</div>`;
+                logRaw(`Erreur: ${error.message}`);
+            }
+        }
+        
+        async function testProductGeneration() {
+            const resultDiv = document.getElementById('product-result');
+            const apiKey = document.getElementById('api-key').value;
+            const model = document.getElementById('model').value;
+            const productName = document.getElementById('product-name').value;
+            const category = document.getElementById('category').value;
+            
+            resultDiv.innerHTML = '<span class="loading">Génération en cours...</span>';
+            logRaw('Début génération produit');
+            
+            try {
+                const prompt = `Génère une description professionnelle en français pour le produit: "${productName}" dans la catégorie ${category}. 
+                La réponse doit être structurée ainsi:
+                DESCRIPTION: [description principale engageante]
+                CARACTÉRISTIQUES: [liste de 3-5 caractéristiques clés, séparées par |]
+                PRIX_SUGGÉRÉ: [prix suggéré en euros, juste le nombre]`;
+                
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+                logRaw(`URL: ${url}`);
+                logRaw(`Prompt: ${prompt}`);
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: prompt
+                            }]
+                        }]
+                    })
+                });
+                
+                logRaw(`Status: ${response.status} ${response.statusText}`);
+                
+                const responseText = await response.text();
+                logRaw(`Réponse: ${responseText}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${responseText}`);
+                }
+                
+                const data = JSON.parse(responseText);
+                const content = data.candidates[0].content.parts[0].text;
+                
+                resultDiv.innerHTML = `
+                    <div class="result success">
+                        <strong>Description générée:</strong><br>
+                        <pre>${content}</pre>
+                    </div>
+                `;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">Erreur: ${error.message}</div>`;
+                logRaw(`Erreur: ${error.message}`);
+            }
+        }
+        
+        async function testWithHeaders() {
+            const resultDiv = document.getElementById('headers-result');
+            const apiKey = document.getElementById('api-key').value;
+            const model = document.getElementById('model').value;
+            
+            resultDiv.innerHTML = '<span class="loading">Test avec headers...</span>';
+            logRaw('Test avec headers complets');
+            
+            try {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: "Test avec headers complets"
+                            }]
+                        }],
+                        generationConfig: {
+                            temperature: 0.7,
+                            topK: 40,
+                            topP: 0.95,
+                            maxOutputTokens: 100
+                        }
+                    })
+                });
+                
+                const responseText = await response.text();
+                logRaw(`Réponse avec headers: ${responseText}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${responseText}`);
+                }
+                
+                const data = JSON.parse(responseText);
+                resultDiv.innerHTML = `<div class="success">Succès avec headers!</div>`;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">Erreur: ${error.message}</div>`;
+                logRaw(`Erreur avec headers: ${error.message}`);
+            }
+        }
+    </script>
+</body>
+</html>
