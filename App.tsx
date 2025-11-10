@@ -251,8 +251,15 @@ const App: React.FC = () => {
           return sum + price * item.quantity;
         }, 0);
         
+        // Validation des données du client pour éviter les valeurs undefined
+        const validatedCustomer = {
+          name: customer.name?.trim() || '',
+          phone: customer.phone?.trim() || '',
+          address: customer.address?.trim() || ''
+        };
+        
         transaction.set(orderRef, {
-          customer,
+          customer: validatedCustomer,
           items: cart,
           total,
           status: 'Nouvelle',

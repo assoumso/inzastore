@@ -30,6 +30,13 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, cart, on
       alert("Votre panier est vide.");
       return;
     }
+    
+    // Validation des données du client
+    if (!customer.name?.trim() || !customer.phone?.trim() || !customer.address?.trim()) {
+      alert("Veuillez remplir tous les champs obligatoires.");
+      return;
+    }
+    
     onPlaceOrder(customer);
   };
 
